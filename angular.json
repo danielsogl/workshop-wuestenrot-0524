@@ -30,6 +30,8 @@
               "src/assets"
             ],
             "styles": [
+              "node_modules/@angular-architects/paper-design/assets/scss/paper-dashboard.scss",
+              "node_modules/@angular-architects/paper-design/assets/css/bootstrap.css",
               "src/styles.scss"
             ],
             "scripts": []
