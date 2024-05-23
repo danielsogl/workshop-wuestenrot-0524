@@ -5,8 +5,8 @@ export type CityFormat = 'long' | 'short';
 
 @Pipe({
   name: 'city',
-  standalone: true,
   pure: true,
+  standalone: true,
 })
 export class CityPipe implements PipeTransform {
   private configService = inject(ConfigService);

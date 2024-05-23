@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe, NgFor, NgIf } from '@angular/common';
 import { Flight } from '../model/flight';
 import { FormsModule } from '@angular/forms';
 import { FlightService } from '../services/flight.service';
@@ -7,6 +7,8 @@ import { DefaultFlightServiceService } from '../services/default-flight-service.
 import { CityPipe } from '../shared/city.pipe';
 import { StatusColorPipe } from '../shared/status-color.pipe';
 import { StatusFilterPipe } from '../shared/status-filter.pipe';
+import { SharedModule } from '../shared/shared.module';
+import { FlightCardComponent } from '../flight-card/flight-card.component';
 
 @Component({
   selector: 'app-flight-search',
@@ -14,9 +16,11 @@ import { StatusFilterPipe } from '../shared/status-filter.pipe';
   imports: [
     CommonModule,
     FormsModule,
-    CityPipe,
     StatusColorPipe,
     StatusFilterPipe,
+    SharedModule,
+    CityPipe,
+    FlightCardComponent,
   ],
   templateUrl: './flight-search.component.html',
   styleUrls: ['./flight-search.component.scss'],
@@ -29,6 +33,10 @@ export class FlightSearchComponent {
   to = 'Hamburg';
   flights: Array<Flight> = [];
   selectedFlight: Flight | undefined;
+
+  basket: Record<number, boolean> = {
+    1209: true,
+  };
 
   message = '';
   onlyDelayed = false;

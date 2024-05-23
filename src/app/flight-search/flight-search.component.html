@@ -33,7 +33,15 @@
   </div>
 </form>
 
-@if (flights.length > 0) {
+@for (flight of flights; track $index) {
+<app-flight-card [item]="flight" [(selected)]="basket[flight.id]">
+</app-flight-card>
+}
+
+<p>Basket:</p>
+<pre>{{ basket | json }}</pre>
+
+<!-- @if (flights.length > 0) {
 <table class="table table-condensed">
   <thead>
     <tr>
@@ -64,7 +72,7 @@
     }
   </tbody>
 </table>
-}
+} -->
 <!--  -->
 
 @if (selectedFlight) {
