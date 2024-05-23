@@ -12,6 +12,16 @@
     <input [(ngModel)]="to" name="to" class="form-control" />
   </div>
 
+  <div class="form-group mt20">
+    <input
+      type="checkbox"
+      [(ngModel)]="onlyDelayed"
+      name="onlyDelayed"
+      id="onlyDelayed"
+    />
+    <label class="ml10" for="onlyDelayed">Only Delayed</label>
+  </div>
+
   <div class="form-group">
     <button
       class="btn btn-default"
@@ -31,16 +41,22 @@
       <th>From</th>
       <th>To</th>
       <th>Date</th>
+      <th>Delayed</th>
       <th></th>
     </tr>
   </thead>
   <tbody>
-    @for (f of flights; track f.id) {
+    @for (f of flights | statusFilter: onlyDelayed; track f.id) {
     <tr [class.selected]="f === selectedFlight">
       <td>{{ f.id }}</td>
-      <td>{{ f.from }}</td>
-      <td>{{ f.to }}</td>
-      <td>{{ f.date | date }}</td>
+      <td>{{ f.from | city : "short" }}</td>
+      <td>{{ f.to | city : "long" }}</td>
+      <td [ngStyle]="{ color: f.delayed | statusColor }">
+        {{ f.date | date }}
+      </td>
+      <td>
+        {{ f.delayed }}
+      </td>
       <td>
         <a class="link" (click)="select(f)">Select</a>
       </td>

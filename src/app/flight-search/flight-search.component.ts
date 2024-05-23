@@ -1,16 +1,23 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient } from '@angular/common/http';
 import { Flight } from '../model/flight';
 import { FormsModule } from '@angular/forms';
 import { FlightService } from '../services/flight.service';
-import { DummyFlightService } from '../services/dummy-flight.service';
 import { DefaultFlightServiceService } from '../services/default-flight-service.service';
+import { CityPipe } from '../shared/city.pipe';
+import { StatusColorPipe } from '../shared/status-color.pipe';
+import { StatusFilterPipe } from '../shared/status-filter.pipe';
 
 @Component({
   selector: 'app-flight-search',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [
+    CommonModule,
+    FormsModule,
+    CityPipe,
+    StatusColorPipe,
+    StatusFilterPipe,
+  ],
   templateUrl: './flight-search.component.html',
   styleUrls: ['./flight-search.component.scss'],
   providers: [
@@ -19,11 +26,12 @@ import { DefaultFlightServiceService } from '../services/default-flight-service.
 })
 export class FlightSearchComponent {
   from = 'London';
-  to = 'Paris';
+  to = 'Hamburg';
   flights: Array<Flight> = [];
   selectedFlight: Flight | undefined;
 
   message = '';
+  onlyDelayed = false;
 
   private flightService = inject(FlightService);
 
