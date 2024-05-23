@@ -1,3 +1,7 @@
-import { InjectionToken } from '@angular/core';
+export interface Config {
+  baseUrl: string;
+}
 
-export const BASE_URL = new InjectionToken<string>('BASE_URL');
+export const initConfig: Config = {
+  baseUrl: '',
+};

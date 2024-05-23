@@ -1,19 +1,19 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { BASE_URL } from '../config/config';
 import { Flight } from '../model/flight';
 import { FlightService } from './flight.service';
+import { ConfigService } from '../shared/config.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class DefaultFlightServiceService implements FlightService {
   private http = inject(HttpClient);
-  private baseUrl = inject(BASE_URL);
+  private configService = inject(ConfigService);
 
   search(from: string, to: string): Observable<Flight[]> {
-    const url = `${this.baseUrl}/api/flight`;
+    const url = `${this.configService.config.baseUrl}/flight`;
 
     const headers = {
       Accept: 'application/json',
@@ -28,7 +28,7 @@ export class DefaultFlightServiceService implements FlightService {
   }
 
   save(flight: Flight): Observable<Flight> {
-    const url = `${this.baseUrl}/api/flight`;
+    const url = `${this.configService.config.baseUrl}/flight`;
 
     const headers = {
       Accept: 'application/json',
