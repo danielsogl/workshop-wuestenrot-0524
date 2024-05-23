@@ -2,20 +2,32 @@
   <h2 class="title">Flight Search</h2>
 </div>
 
-<form>
+<form [formGroup]="searchForm">
   <div class="form-group">
     <label>From:</label>
-    <input [(ngModel)]="from" name="from" class="form-control" />
+    <input formControlName="from" name="from" class="form-control" />
+
+    <pre>{{ searchForm.controls.from.errors | json }}</pre>
   </div>
   <div class="form-group">
     <label>To:</label>
-    <input [(ngModel)]="to" name="to" class="form-control" />
+    <input formControlName="to" name="to" class="form-control" />
   </div>
 
   <div class="form-group mt20">
     <input
       type="checkbox"
-      [(ngModel)]="onlyDelayed"
+      formControlName="withValidators"
+      name="withValidators"
+      id="withValidators"
+    />
+    <label class="ml10" for="withValidators">With validators</label>
+  </div>
+
+  <div class="form-group mt20">
+    <input
+      type="checkbox"
+      formControlName="onlyDelayed"
       name="onlyDelayed"
       id="onlyDelayed"
     />
@@ -25,13 +37,16 @@
   <div class="form-group">
     <button
       class="btn btn-default"
-      [dir]="from === '' || to === ''"
+      [disabled]="searchForm.invalid"
       (click)="search()"
     >
       Search
     </button>
   </div>
 </form>
+
+<pre>{{ searchForm.errors | json }}</pre>
+<pre>{{ searchForm.value | json }}</pre>
 
 @for (flight of flights; track $index) {
 <app-flight-card [item]="flight" [(selected)]="basket[flight.id]">

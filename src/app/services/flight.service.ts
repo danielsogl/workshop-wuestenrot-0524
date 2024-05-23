@@ -7,7 +7,7 @@ import { DummyFlightService } from './dummy-flight.service';
 @Injectable({
   providedIn: 'root',
   useFactory: () => {
-    if (isDevMode()) {
+    if (!isDevMode()) {
       return new DummyFlightService();
     } else {
       return new DefaultFlightServiceService();

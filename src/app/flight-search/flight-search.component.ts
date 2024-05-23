@@ -1,7 +1,14 @@
-import { Component, inject } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule, DatePipe, NgFor, NgIf } from '@angular/common';
 import { Flight } from '../model/flight';
-import { FormsModule } from '@angular/forms';
+import {
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import { FlightService } from '../services/flight.service';
 import { DefaultFlightServiceService } from '../services/default-flight-service.service';
 import { CityPipe } from '../shared/city.pipe';
@@ -9,6 +16,14 @@ import { StatusColorPipe } from '../shared/status-color.pipe';
 import { StatusFilterPipe } from '../shared/status-filter.pipe';
 import { SharedModule } from '../shared/shared.module';
 import { FlightCardComponent } from '../flight-card/flight-card.component';
+import { CityValidators } from '../shared/validation/city-validator';
+
+interface FlightSearchForm {
+  from: FormControl<string>;
+  to: FormControl<string>;
+  onlyDelayed: FormControl<boolean>;
+  withValidators: FormControl<boolean>;
+}
 
 @Component({
   selector: 'app-flight-search',
@@ -16,6 +31,7 @@ import { FlightCardComponent } from '../flight-card/flight-card.component';
   imports: [
     CommonModule,
     FormsModule,
+    ReactiveFormsModule,
     StatusColorPipe,
     StatusFilterPipe,
     SharedModule,
@@ -24,13 +40,12 @@ import { FlightCardComponent } from '../flight-card/flight-card.component';
   ],
   templateUrl: './flight-search.component.html',
   styleUrls: ['./flight-search.component.scss'],
-  providers: [
-    { provide: FlightService, useClass: DefaultFlightServiceService },
-  ],
 })
-export class FlightSearchComponent {
-  from = 'London';
-  to = 'Hamburg';
+export class FlightSearchComponent implements OnInit {
+  private flightService = inject(FlightService);
+
+  // from = 'London';
+  // to = 'Hamburg';
   flights: Array<Flight> = [];
   selectedFlight: Flight | undefined;
 
@@ -41,7 +56,65 @@ export class FlightSearchComponent {
   message = '';
   onlyDelayed = false;
 
-  private flightService = inject(FlightService);
+  private formBuilder = inject(FormBuilder);
+
+  from = this.formBuilder.group({
+    value: [
+      '',
+      [Validators.required, Validators.minLength(3)],
+      [CityValidators.validateCityAsync(this.flightService)],
+    ],
+    disabled: false,
+  });
+
+  searchForm = new FormGroup<FlightSearchForm>(
+    {
+      from: new FormControl('London', {
+        validators: [
+          Validators.required,
+          Validators.minLength(3),
+          // CityValidators.validateCity(['Graz', 'Hamburg', 'Frankfurt', 'Vienna']),
+        ],
+        asyncValidators: [CityValidators.validateCityAsync(this.flightService)],
+        nonNullable: true,
+      }),
+      to: new FormControl('Hamburg', {
+        validators: [
+          Validators.required,
+          Validators.minLength(3),
+          // CityValidators.validateCity(['Graz', 'Hamburg', 'Frankfurt', 'Vienna']),
+        ],
+        asyncValidators: [CityValidators.validateCityAsync(this.flightService)],
+        nonNullable: true,
+      }),
+      onlyDelayed: new FormControl(false, { nonNullable: true }),
+      withValidators: new FormControl(false, { nonNullable: true }),
+    },
+    {
+      validators: [CityValidators.validateRoundtrip],
+    }
+  );
+
+  ngOnInit(): void {
+    // this.searchForm.valueChanges.subscribe((value) => {
+    //   console.log('Value changed', value);
+    // });
+
+    this.searchForm.controls['withValidators'].valueChanges.subscribe(
+      (value) => {
+        const validators = [Validators.required, Validators.minLength(3)];
+        if (value) {
+          this.searchForm.controls['from'].setValidators(validators);
+          this.searchForm.controls['to'].setValidators(validators);
+        } else {
+          this.searchForm.controls['from'].clearValidators();
+          this.searchForm.controls['to'].clearValidators();
+        }
+
+        this.searchForm.updateValueAndValidity();
+      }
+    );
+  }
 
   // old way to use the dependency inject
   // constructor(private http: HttpClient) {}
@@ -51,7 +124,9 @@ export class FlightSearchComponent {
     this.message = '';
     this.selectedFlight = undefined;
 
-    this.flightService.search(this.from, this.to).subscribe({
+    const { from, to } = this.searchForm.getRawValue();
+
+    this.flightService.search(from, to).subscribe({
       next: (flights) => {
         this.flights = flights;
       },

@@ -13,7 +13,7 @@ export class DefaultFlightServiceService implements FlightService {
   private configService = inject(ConfigService);
 
   search(from: string, to: string): Observable<Flight[]> {
-    const url = `${this.configService.config.baseUrl}/flight`;
+    const url = `https://demo.angulararchitects.io/api/flight`;
 
     const headers = {
       Accept: 'application/json',
@@ -28,7 +28,7 @@ export class DefaultFlightServiceService implements FlightService {
   }
 
   save(flight: Flight): Observable<Flight> {
-    const url = `${this.configService.config.baseUrl}/flight`;
+    const url = `https://demo.angulararchitects.io/api/flight`;
 
     const headers = {
       Accept: 'application/json',
