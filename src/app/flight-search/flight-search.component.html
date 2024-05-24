@@ -25,7 +25,8 @@
   <div class="form-group">
     <button
       class="btn btn-default"
-      [dir]="from === '' || to === ''"
+      data-testid="search-button"
+      [disabled]="from === '' || to === ''"
       (click)="search()"
     >
       Search
@@ -34,7 +35,7 @@
 </form>
 
 @for (flight of flights; track $index) {
-<app-flight-card [item]="flight" [(selected)]="basket[flight.id]">
+<app-flight-card [item]="flight" [(selected)]="basket[flight.id]" data-testid="flight-card">
 </app-flight-card>
 }
 

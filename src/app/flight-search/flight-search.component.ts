@@ -24,9 +24,9 @@ import { FlightCardComponent } from '../flight-card/flight-card.component';
   ],
   templateUrl: './flight-search.component.html',
   styleUrls: ['./flight-search.component.scss'],
-  providers: [
-    { provide: FlightService, useClass: DefaultFlightServiceService },
-  ],
+  // providers: [
+  //   { provide: FlightService, useClass: DefaultFlightServiceService },
+  // ],
 })
 export class FlightSearchComponent {
   from = 'London';
@@ -79,6 +79,8 @@ export class FlightSearchComponent {
   }
 
   select(f: Flight): void {
-    this.selectedFlight = { ...f };
+    setTimeout(() => {
+      this.selectedFlight = { ...f };
+    }, 10000);
   }
 }
