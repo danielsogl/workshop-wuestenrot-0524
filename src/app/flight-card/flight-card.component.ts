@@ -1,12 +1,19 @@
 import {
+  ChangeDetectionStrategy,
   Component,
+  ElementRef,
   EventEmitter,
   Input,
+  NgZone,
   OnChanges,
   OnDestroy,
   OnInit,
   Output,
   SimpleChanges,
+  inject,
+  input,
+  model,
+  output,
 } from '@angular/core';
 import { Flight } from '../model/flight';
 import { CommonModule } from '@angular/common';
@@ -17,21 +24,26 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule],
   templateUrl: './flight-card.component.html',
   styleUrl: './flight-card.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FlightCardComponent implements OnInit, OnChanges, OnDestroy {
-  @Input({
-    required: true,
-    alias: 'item',
-    // transform input values since Angular v14
-    // transform: (value: Flight) => {
-    //   return { ...value, from: 'Bla' };
-    // },
-  })
-  flight!: Flight;
+  // @Input({
+  //   required: true,
+  //   alias: 'item',
+  // })
+  // flight!: Flight;
+  // @Input({ required: true }) selected = false;
 
-  @Input({ required: true }) selected = false;
+  flight = input.required<Flight>({ alias: 'item' });
+  selected = model.required<boolean>();
 
-  @Output() selectedChange = new EventEmitter<boolean>();
+  private element = inject(ElementRef);
+  private zone = inject(NgZone);
+  // selected = input.required<boolean>();
+
+  // selectedChange = output<boolean>();
+
+  // @Output() selectedChange = new EventEmitter<boolean>();
 
   constructor() {
     console.log('constructor', this.flight);
@@ -51,6 +63,19 @@ export class FlightCardComponent implements OnInit, OnChanges, OnDestroy {
 
   toggleSelect() {
     // this.selected = !this.selected;
-    this.selectedChange.emit(!this.selected);
+    this.selected.set(!this.selected);
+  }
+
+  blink() {
+    // Dirty Hack used to visualize the change detector
+    this.element.nativeElement.firstChild.style.backgroundColor = 'crimson';
+
+    this.zone.runOutsideAngular(() => {
+      setTimeout(() => {
+        this.element.nativeElement.firstChild.style.backgroundColor = 'white';
+      }, 1000);
+    });
+
+    return null;
   }
 }

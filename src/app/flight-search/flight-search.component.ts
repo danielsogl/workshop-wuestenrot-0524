@@ -1,4 +1,12 @@
-import { Component, inject } from '@angular/core';
+import {
+  Component,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+} from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { CommonModule, DatePipe, NgFor, NgIf } from '@angular/common';
 import { Flight } from '../model/flight';
 import { FormsModule } from '@angular/forms';
@@ -9,6 +17,8 @@ import { StatusColorPipe } from '../shared/status-color.pipe';
 import { StatusFilterPipe } from '../shared/status-filter.pipe';
 import { SharedModule } from '../shared/shared.module';
 import { FlightCardComponent } from '../flight-card/flight-card.component';
+import { debounceTime } from 'rxjs';
+import { FlightSearchStore } from './flight-search.store';
 
 @Component({
   selector: 'app-flight-search',
@@ -29,19 +39,36 @@ import { FlightCardComponent } from '../flight-card/flight-card.component';
   ],
 })
 export class FlightSearchComponent {
-  from = 'London';
-  to = 'Hamburg';
-  flights: Array<Flight> = [];
-  selectedFlight: Flight | undefined;
+  from = signal<string>('London');
+  to = signal<string>('Hamburg');
+  flights = signal<Flight[]>([]);
+  selectedFlight = signal<Flight | undefined>(undefined);
+
+  searchValues = toSignal(
+    toObservable(
+      computed(() => ({
+        from: this.from(),
+        to: this.to(),
+      }))
+    ).pipe(debounceTime(500)),
+    { initialValue: { from: 'London', to: 'Paris' } }
+  );
+
+  triggerSearch = effect(
+    () => {
+      this.search();
+    },
+    { allowSignalWrites: true }
+  );
 
   basket: Record<number, boolean> = {
     1209: true,
   };
-
   message = '';
   onlyDelayed = false;
 
   private flightService = inject(FlightService);
+  protected flightSearchStore = inject(FlightSearchStore);
 
   // old way to use the dependency inject
   // constructor(private http: HttpClient) {}
@@ -49,26 +76,17 @@ export class FlightSearchComponent {
   search(): void {
     // Reset properties
     this.message = '';
-    this.selectedFlight = undefined;
+    this.selectedFlight.set(undefined);
 
-    this.flightService.search(this.from, this.to).subscribe({
-      next: (flights) => {
-        this.flights = flights;
-      },
-      error: (errResp) => {
-        console.error('Error loading flights', errResp);
-      },
-      complete() {
-        console.log('Complete');
-      },
-    });
+    const { from, to } = this.searchValues();
+    this.flightSearchStore.search(from, to);
   }
 
   save(): void {
     if (!this.selectedFlight) return;
-    this.flightService.save(this.selectedFlight).subscribe({
+    this.flightService.save(this.selectedFlight()!).subscribe({
       next: (flight) => {
-        this.selectedFlight = flight;
+        this.selectedFlight.set(flight);
         this.message = 'Update successful!';
       },
       error: (errResponse) => {
@@ -79,6 +97,13 @@ export class FlightSearchComponent {
   }
 
   select(f: Flight): void {
-    this.selectedFlight = { ...f };
+    this.selectedFlight.set({ ...f });
+  }
+
+  updateFlight(f: Partial<Flight>): void {
+    this.selectedFlight.update((flight) => {
+      if (!flight) return;
+      return { ...flight, ...f };
+    });
   }
 }

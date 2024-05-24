@@ -1,7 +1,7 @@
 <div class="card" [ngClass]="{ selected: selected }">
   <div class="card-header">
-    <h4 class="title">Flight {{ flight.from }} to: {{ flight.to }}</h4>
-    <h6>Flight ID: {{ flight.id }}</h6>
+    <h4 class="title">Flight {{ flight().from }} to: {{ flight().to }}</h4>
+    <h6>Flight ID: {{ flight().id }}</h6>
   </div>
   <div class="card-body">
     <ng-content select=".content" />
@@ -9,7 +9,8 @@
   <div class="card-footer">
     <ng-content select=".footer" />
     <button class="btn default-btn" (click)="toggleSelect()">
-      {{ selected ? "Unselect" : "Select" }}
+      {{ selected() ? "Unselect" : "Select" }}
     </button>
   </div>
 </div>
+{{ blink() }}

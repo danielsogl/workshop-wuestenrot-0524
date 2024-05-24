@@ -4,6 +4,8 @@ import { Observable } from 'rxjs';
 import { Flight } from '../model/flight';
 import { FlightService } from './flight.service';
 import { ConfigService } from '../shared/config.service';
+import { patchState, signalState } from '@ngrx/signals';
+import { updateState } from '@angular-architects/ngrx-toolkit';
 
 @Injectable({
   providedIn: 'root',
@@ -11,6 +13,16 @@ import { ConfigService } from '../shared/config.service';
 export class DefaultFlightServiceService implements FlightService {
   private http = inject(HttpClient);
   private configService = inject(ConfigService);
+
+  store = signalState({
+    flights: [],
+    loading: false,
+    selectedFlight: {} as Flight,
+  });
+
+  constructor() {
+    patchState(this.store, { flights: [] });
+  }
 
   search(from: string, to: string): Observable<Flight[]> {
     const url = `${this.configService.config.baseUrl}/flight`;
