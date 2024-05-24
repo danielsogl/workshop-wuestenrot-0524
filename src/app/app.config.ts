@@ -1,14 +1,27 @@
-import { ApplicationConfig, DEFAULT_CURRENCY_CODE, importProvidersFrom } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import {
+  ApplicationConfig,
+  DEFAULT_CURRENCY_CODE,
+  importProvidersFrom,
+} from '@angular/core';
+import {
+  PreloadAllModules,
+  provideRouter,
+  withComponentInputBinding,
+  withPreloading,
+} from '@angular/router';
 
 import { routes } from './app.routes';
 import { provideHttpClient } from '@angular/common/http';
 import { DATE_PIPE_DEFAULT_OPTIONS } from '@angular/common';
-import { NextFlightsModule } from './next-flights/next-flights.module';
+import { NextFlightsModule } from './flight-booking/next-flights/next-flights.module';
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideRouter(routes),
+    provideRouter(
+      routes,
+      withComponentInputBinding(),
+      withPreloading(PreloadAllModules)
+    ),
     provideHttpClient(),
     importProvidersFrom(NextFlightsModule),
     { provide: DATE_PIPE_DEFAULT_OPTIONS, useValue: { format: 'dd.MM.yyyy' } },

@@ -7,14 +7,16 @@ import {
   OnInit,
   Output,
   SimpleChanges,
+  inject,
 } from '@angular/core';
-import { Flight } from '../model/flight';
 import { CommonModule } from '@angular/common';
+import { Router, RouterLink } from '@angular/router';
+import { Flight } from '../../model/flight';
 
 @Component({
   selector: 'app-flight-card',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterLink],
   templateUrl: './flight-card.component.html',
   styleUrl: './flight-card.component.scss',
 })
@@ -32,6 +34,8 @@ export class FlightCardComponent implements OnInit, OnChanges, OnDestroy {
   @Input({ required: true }) selected = false;
 
   @Output() selectedChange = new EventEmitter<boolean>();
+
+  private router = inject(Router);
 
   constructor() {
     console.log('constructor', this.flight);
@@ -52,5 +56,9 @@ export class FlightCardComponent implements OnInit, OnChanges, OnDestroy {
   toggleSelect() {
     // this.selected = !this.selected;
     this.selectedChange.emit(!this.selected);
+  }
+
+  openEdit() {
+    this.router.navigate(['../']);
   }
 }

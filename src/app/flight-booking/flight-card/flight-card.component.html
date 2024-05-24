@@ -1,4 +1,9 @@
-<div class="card" [ngClass]="{ selected: selected }">
+<div
+  class="card"
+  [ngClass]="{ selected: selected }"
+  [routerLink]="['../flight-edit', flight.id]"
+  [queryParams]="{ from: flight.from, to: flight.to }"
+>
   <div class="card-header">
     <h4 class="title">Flight {{ flight.from }} to: {{ flight.to }}</h4>
     <h6>Flight ID: {{ flight.id }}</h6>

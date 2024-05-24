@@ -1,22 +1,21 @@
+import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
-import { CommonModule, DatePipe, NgFor, NgIf } from '@angular/common';
-import { Flight } from '../model/flight';
 import {
-  FormBuilder,
   FormControl,
-  FormGroup,
   FormsModule,
   ReactiveFormsModule,
+  FormBuilder,
   Validators,
+  FormGroup,
 } from '@angular/forms';
-import { FlightService } from '../services/flight.service';
-import { DefaultFlightServiceService } from '../services/default-flight-service.service';
-import { CityPipe } from '../shared/city.pipe';
-import { StatusColorPipe } from '../shared/status-color.pipe';
-import { StatusFilterPipe } from '../shared/status-filter.pipe';
-import { SharedModule } from '../shared/shared.module';
+import { Flight } from '../../model/flight';
+import { FlightService } from '../../services/flight.service';
+import { CityPipe } from '../../shared/city.pipe';
+import { SharedModule } from '../../shared/shared.module';
+import { StatusColorPipe } from '../../shared/status-color.pipe';
+import { StatusFilterPipe } from '../../shared/status-filter.pipe';
+import { CityValidators } from '../../shared/validation/city-validator';
 import { FlightCardComponent } from '../flight-card/flight-card.component';
-import { CityValidators } from '../shared/validation/city-validator';
 
 interface FlightSearchForm {
   from: FormControl<string>;

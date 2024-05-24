@@ -42,4 +42,14 @@ export class DummyFlightService implements FlightService {
       delayed: true,
     });
   }
+
+  findById(id: string): Observable<Flight> {
+    return of({
+      id: +id,
+      from: 'London',
+      to: 'Paris',
+      date: new Date().toDateString(),
+      delayed: true,
+    });
+  }
 }

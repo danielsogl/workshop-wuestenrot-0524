@@ -17,4 +17,5 @@ import { DummyFlightService } from './dummy-flight.service';
 export abstract class FlightService {
   abstract search(from: string, to: string): Observable<Flight[]>;
   abstract save(flight: Flight): Observable<Flight>;
+  abstract findById(id: string): Observable<Flight>;
 }
