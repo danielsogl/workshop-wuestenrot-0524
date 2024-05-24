@@ -16,6 +16,7 @@ import { StatusColorPipe } from '../../shared/status-color.pipe';
 import { StatusFilterPipe } from '../../shared/status-filter.pipe';
 import { CityValidators } from '../../shared/validation/city-validator';
 import { FlightCardComponent } from '../flight-card/flight-card.component';
+import { concatMap, map, mergeMap, switchMap, exhaustMap } from 'rxjs';
 
 interface FlightSearchForm {
   from: FormControl<string>;
@@ -94,10 +95,23 @@ export class FlightSearchComponent implements OnInit {
     }
   );
 
+  flightResult$ = this.searchForm.valueChanges.pipe(
+    map(() => this.searchForm.getRawValue()),
+    // cancels the previous request
+    switchMap(({ from, to }) => this.flightService.search(from, to))
+    // keeps the order of the requests
+    // concatMap(({ from, to }) => this.flightService.search(from, to))
+    // sends requests in parallel
+    // mergeMap(({ from, to }) => this.flightService.search(from, to))
+    // waits for the previous request to complete
+    // exhaustMap(({ from, to }) => this.flightService.search(from, to))
+  );
+
   ngOnInit(): void {
     // this.searchForm.valueChanges.subscribe((value) => {
     //   console.log('Value changed', value);
     // });
+    this.flightResult$.subscribe();
 
     this.searchForm.controls['withValidators'].valueChanges.subscribe(
       (value) => {
@@ -113,6 +127,8 @@ export class FlightSearchComponent implements OnInit {
         this.searchForm.updateValueAndValidity();
       }
     );
+
+    this.searchForm.valueChanges.subscribe((value) => {});
   }
 
   // old way to use the dependency inject

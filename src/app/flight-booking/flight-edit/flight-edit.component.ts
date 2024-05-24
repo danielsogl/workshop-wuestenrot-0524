@@ -1,17 +1,18 @@
-import { Component, Input, OnInit, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FlightService } from '../../services/flight.service';
-import { Flight, initialFlight } from '../../model/flight';
-import { JsonPipe } from '@angular/common';
+import { Flight } from '../../model/flight';
+import { AsyncPipe, JsonPipe } from '@angular/common';
+import { filter, map, share, shareReplay, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-flight-edit',
   standalone: true,
-  imports: [JsonPipe],
+  imports: [JsonPipe, AsyncPipe],
   templateUrl: './flight-edit.component.html',
   styleUrl: './flight-edit.component.scss',
 })
-export class FlightEditComponent implements OnInit {
+export class FlightEditComponent {
   private route = inject(ActivatedRoute);
   private flightService = inject(FlightService);
 
@@ -19,17 +20,26 @@ export class FlightEditComponent implements OnInit {
   showDetails = '';
   flight: Flight | undefined;
 
-  ngOnInit(): void {
-    this.route.paramMap.subscribe((params) => {
-      this.id = params.get('id') ?? '';
-      this.showDetails = params.get('showDetails') ?? '';
-      this.load(this.id);
-    });
-  }
+  flight$ = this.route.paramMap.pipe(
+    filter((params) => params.has('id')),
+    map((params) => params.get('id')!),
+    // higher order operator
+    switchMap((id) => this.flightService.findById(id)),
+    // multicasting
+    shareReplay({ refCount: true, bufferSize: 1 })
+  );
 
-  load(id: string): void {
-    this.flightService.findById(id).subscribe((flight) => {
-      this.flight = flight;
-    });
-  }
+  // ngOnInit(): void {
+  //   this.route.paramMap.subscribe((params) => {
+  //     this.id = params.get('id') ?? '';
+  //     this.showDetails = params.get('showDetails') ?? '';
+  //     this.load(this.id);
+  //   });
+  // }
+
+  // load(id: string): void {
+  //   this.flightService.findById(id).subscribe((flight) => {
+  //     this.flight = flight;
+  //   });
+  // }
 }
